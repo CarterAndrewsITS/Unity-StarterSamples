@@ -1,0 +1,5 @@
+C:/Users/andre/Documents/GitHub/Unity-StarterSamples/.utmp/RelWithDebInfo/6c3b652j/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/andre/Documents/GitHub/Unity-StarterSamples/.utmp/RelWithDebInfo/6c3b652j/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/Users/andre/Documents/GitHub/Unity-StarterSamples/.utmp/RelWithDebInfo/6c3b652j/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/Users/andre/Documents/GitHub/Unity-StarterSamples/.utmp/RelWithDebInfo/6c3b652j/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/Users/andre/Documents/GitHub/Unity-StarterSamples/.utmp/RelWithDebInfo/6c3b652j/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
