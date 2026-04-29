@@ -218,7 +218,7 @@ public class MoviePlayerSample : MonoBehaviour
                     Play(video, null);
                 }
 #else
-                Play(Application.streamingAssetsPath + "/" + MovieName, null);
+                Play(System.IO.Path.Combine(Application.persistentDataPath, "Voytilla_COMM103 180VR_v1_150mpbs.mp4"), null);
 #endif
             }
             else
