@@ -92,6 +92,7 @@ public class Stereo180VideoPlayer : MonoBehaviour
         _videoPlayer.prepareCompleted += OnVideoPrepared;
     }
 
+    
     void OnVideoPrepared(VideoPlayer vp)
     {
         // Resize the RenderTexture to exactly match the video dimensions

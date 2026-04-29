@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
+using UnityEngine.Video;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
@@ -89,22 +89,77 @@ public class GameManager : MonoBehaviour
         {
             menuPress();
         }
+        if (OVRInput.GetDown(OVRInput.Button.One))
+        {
+            JumpToTime(360f);
+        }
     }
     public void menuPress()
     {
         if (SceneManager.GetActiveScene().name == homeScene)
+        {
+            SummonMenu();
             return;
+        }
         if (isPaused)
         {
             pauseMenu.SetActive(false);
             isPaused = false;
+            ResumeVideoPlayerInScene();
         }
         else
         {
             SummonMenu();
             pauseMenu.SetActive(true);
             isPaused = true;
+            PauseVideoPlayerInScene();
         }
+    }
+    public void PauseVideoPlayerInScene()
+    {
+        VideoPlayer vp = FindObjectOfType<VideoPlayer>();
+
+        if (vp != null)
+        {
+            vp.Pause();
+            Debug.Log("Video paused.");
+        }
+        else
+        {
+            Debug.LogWarning("No VideoPlayer found in the scene.");
+        }
+    }
+    public void ResumeVideoPlayerInScene()
+    {
+        VideoPlayer vp = FindObjectOfType<VideoPlayer>();
+
+        if (vp != null)
+        {
+            vp.Play(); // resumes if paused
+            Debug.Log("Video resumed.");
+        }
+        else
+        {
+            Debug.LogWarning("No VideoPlayer found in the scene.");
+        }
+    }
+    public void JumpToTime(double timeInSeconds)
+    {
+        VideoPlayer videoPlayer = FindObjectOfType<VideoPlayer>();
+        if (videoPlayer == null)
+        {
+            Debug.LogWarning("VideoPlayer not assigned.");
+            return;
+        }
+
+        if (!videoPlayer.isPrepared)
+        {
+            Debug.LogWarning("VideoPlayer not ready yet.");
+            return;
+        }
+
+        videoPlayer.time = timeInSeconds;
+        Debug.Log($"Jumped to {timeInSeconds} seconds.");
     }
     public void goHome()
     {
