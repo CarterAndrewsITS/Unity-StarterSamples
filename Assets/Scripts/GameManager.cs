@@ -10,10 +10,66 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<string> projectScenes = new List<string>();
     [SerializeField] private string passthroughScene;
     [SerializeField] private string vrScene;
+    [SerializeField] private string homeScene;
     [SerializeField] private bool isPassthrough;
     [SerializeField] private bool isVisibleTimer;
     [SerializeField] private bool isSlides;
     [SerializeField] private bool isNoteCards;
+    [SerializeField] private bool isPaused=false;
+    [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject startButton;
+    [SerializeField] private GameObject quitButton;
+
+    [Header("Placement Settings")]
+    [SerializeField] private float distanceFromPlayer = 1.5f;
+    [SerializeField] private float verticalOffset = -0.1f; // slightly below eye level
+    [SerializeField] private float horizontalOffset = -0.1f; // slightly below eye level
+
+    private Transform GetCamera()
+    {
+        // Works across scene loads - always finds the active camera
+        Camera cam = Camera.main;
+        return cam != null ? cam.transform : null;
+    }
+    public void SummonMenu()
+    {
+        Vector3 spawnPosition = GetMenuPosition();
+        Quaternion spawnRotation = GetMenuRotation(spawnPosition);
+        pauseMenu.transform.position = spawnPosition;
+        pauseMenu.transform.rotation = spawnRotation;
+        
+    }
+
+    private Vector3 GetMenuPosition()
+    {
+        // Use only the horizontal (Y) rotation of the camera - ignore tilt
+        Transform cam = GetCamera();
+        Vector3 flatForward = cam.forward;
+        flatForward.y = 0f;
+        flatForward.Normalize();
+
+        Vector3 position = Camera.main.transform.position
+            + flatForward * distanceFromPlayer
+            + Vector3.up * verticalOffset;
+            
+
+        return position;
+    }
+
+    private Quaternion GetMenuRotation(Vector3 menuPosition)
+    {
+        Transform cam = GetCamera();
+        if (cam == null) return Quaternion.identity;
+
+        // Direction from menu TO player, flattened so menu stays upright
+        Vector3 directionToPlayer = cam.position - menuPosition;
+        directionToPlayer.y = 0f;
+
+        if (directionToPlayer == Vector3.zero)
+            return Quaternion.identity;
+
+        return Quaternion.LookRotation(-directionToPlayer);
+    }
     private void Awake()
     {
         // Enforce singleton
@@ -22,14 +78,52 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        Invoke(nameof(SummonMenu), 0.1f);
     }
-
+    
+    private void Update()
+    {
+        if (OVRInput.GetDown(OVRInput.Button.Start))
+        {
+            menuPress();
+        }
+    }
+    public void menuPress()
+    {
+        if (SceneManager.GetActiveScene().name == homeScene)
+            return;
+        if (isPaused)
+        {
+            pauseMenu.SetActive(false);
+            isPaused = false;
+        }
+        else
+        {
+            SummonMenu();
+            pauseMenu.SetActive(true);
+            isPaused = true;
+        }
+    }
+    public void goHome()
+    {
+        startButton.SetActive(true);
+        quitButton.SetActive(false);
+        isPaused = false;
+        LoadScene(homeScene);
+        Invoke(nameof(SummonMenu), 0.1f);
+    }
     public void BeginPresentation()
     {
-        SceneManager.LoadScene(vrScene);
+        if(isPassthrough)
+            SceneManager.LoadScene(passthroughScene);
+        else
+            SceneManager.LoadScene(vrScene);
+        startButton.SetActive(false);
+        quitButton.SetActive(true);
+        pauseMenu.SetActive(false);
+        
     }
     public void togglePassthrough()
     {
@@ -66,6 +160,7 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void ReloadCurrentScene()
     {
+        menuPress();
         Scene currentScene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(currentScene.name);
     }
